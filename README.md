@@ -28,6 +28,8 @@ A Windows 7 styled frontend for [yt-dlp](https://github.com/yt-dlp/yt-dlp). Past
 - **Conversion list** with progress, time left, and the before and after file size, plus the exact ffmpeg command in the details panel
 - Never overwrites a file. Output goes next to the original by default, named like `Title [iPod 5G].m4v`
 
+![aero-dlp convert screenshot](screenshot_2.png)
+
 ## Requirements
 
 - Python 3.10 or newer
