@@ -1,6 +1,6 @@
 # aero-dlp
 
-A Windows 7 styled frontend for [yt-dlp](https://github.com/yt-dlp/yt-dlp). Paste a link, pick a format and quality, and download. It runs locally and opens in your browser, dressed in Aero glass with [7.css](https://khang-nd.github.io/7.css/).
+A Windows 7 styled frontend for [yt-dlp](https://github.com/yt-dlp/yt-dlp). Paste a link, pick a format and quality, and download. A Convert tab then shrinks what you downloaded for devices like an iPod, HandBrake style. It runs locally and opens in your browser, dressed in Aero glass with [7.css](https://khang-nd.github.io/7.css/).
 
 ![aero-dlp screenshot](screenshot.png)
 
@@ -19,12 +19,21 @@ A Windows 7 styled frontend for [yt-dlp](https://github.com/yt-dlp/yt-dlp). Past
 - **One-click yt-dlp update**, which also updates the YouTube challenge solver
 - Remembers your last format, quality, folder and options
 
+### Convert tab
+
+- **Device presets:** iPod Video 5G (320×240), iPod 5.5G, Classic and nano (640×480), Fast 1080p, 720p and 480p, a small H.265 option, a "fit in 10 MB" option, and a change-container-only option that doesn't re-encode
+- **Convert selected…** sends a finished download straight to the Convert tab, and a list of recent downloads is one click away. You can also browse for any video file.
+- **Full control when you want it:** MP4, M4V or MKV, H.264, H.265 or copy, constant quality, average bitrate or target file size, encoder speed, H.264 profile and level, max bitrate, picture size with letterbox, crop, stretch or shrink-only fitting, a frame rate cap, audio codec, bitrate, sample rate and channels, and a start and end time
+- **Source info and a size estimate** before you start
+- **Conversion list** with progress, time left, and the before and after file size, plus the exact ffmpeg command in the details panel
+- Never overwrites a file. Output goes next to the original by default, named like `Title [iPod 5G].m4v`
+
 ## Requirements
 
 - Python 3.10 or newer
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp), installed with its `default` extras (this includes `yt-dlp-ejs`, which YouTube downloads need)
 - [Deno](https://deno.com) 2.3.0 or newer, which yt-dlp uses as its JavaScript runtime for YouTube
-- [ffmpeg](https://ffmpeg.org/download.html) on your PATH. It's needed for MP3 and other audio conversions, and for merging separate video and audio streams.
+- [ffmpeg](https://ffmpeg.org/download.html), including ffprobe, which comes with it. It's needed for MP3 and other audio conversions, for merging separate video and audio streams, and for the whole Convert tab. The H.264 iPod presets need a build with libx264, which the winget, Homebrew and apt packages all have.
 - A modern browser
 
 ## Install
@@ -64,7 +73,20 @@ The status bar at the bottom shows the yt-dlp, ffmpeg and Deno versions it found
 3. Check the **Save to** folder.
 4. Press **Download**. Click a row in the Downloads list to see the details for it.
 
+### Making a video for an iPod
+
+1. Download the video on the **Download** tab.
+2. Select its row and press **Convert selected…**. The Convert tab opens with the file loaded.
+3. Leave the preset on **iPod Video 5G, 320×240** (or pick the 640×480 one for a 5.5G, Classic or nano).
+4. Press **Convert**. The new `.m4v` appears next to the original.
+5. Add the `.m4v` to iTunes or the Music app, or whatever you use to sync, and sync it to the iPod.
+
+The 5G preset follows [Apple's spec](https://support.apple.com/111923) for the iPod with video: H.264 Baseline Profile up to Level 1.3, 320×240, up to 768 kbps and 30 fps, with AAC audio. Videos that aren't 4:3 get black bars so nothing is stretched. Choose **Keep shape, crop the edges** under Picture to fill the screen instead.
+
 ## Troubleshooting
+
+**Converting fails, or the iPod won't play the file**
+Open the Convert tab, select the failed row and read the details. Check the preset matches your model: the original 5G only plays the 320×240 preset, unless it has had a firmware update. If the message says the ffmpeg build can't encode H.264, install a full ffmpeg build (see above).
 
 **HTTP Error 403: Forbidden**
 YouTube is rejecting the download. Since late 2025, yt-dlp needs two things to download from YouTube: a JavaScript runtime (Deno) and the `yt-dlp-ejs` package. Check both:
@@ -91,7 +113,7 @@ The folder picker needs Python's tkinter. If it isn't available, type the folder
 
 ## How it works
 
-`ytdlp_frontend.py` is a single file with no dependencies beyond Python's standard library. It starts a small web server bound to `127.0.0.1`, so it can't be reached from other computers, and serves the page. When you press Download, it runs yt-dlp as a separate process with options built from your choices, and reads its output to show progress.
+`ytdlp_frontend.py` is a single file with no dependencies beyond Python's standard library. It starts a small web server bound to `127.0.0.1`, so it can't be reached from other computers, and serves the page. When you press Download, it runs yt-dlp as a separate process with options built from your choices, and reads its output to show progress. The Convert tab works the same way with ffmpeg: it reads the file with ffprobe, builds an ffmpeg command from your settings, and follows ffmpeg's progress output.
 
 ## Responsible use
 
